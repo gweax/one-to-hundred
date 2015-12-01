@@ -194,15 +194,15 @@
             /* min 170 buttons (max 196) */
             button:first-child:nth-last-child(n+170),
             button:first-child:nth-last-child(n+170) ~ button {
-                width: 6.24vmin;
-                height: 6.24vmin;
+                width: 6.34vmin;
+                height: 6.34vmin;
                 margin: 0.4vmin;
                 font-size: 2vmin;
             }
 
             /* min 197 buttons (max 225) */
-            button:first-child:nth-last-child(n+170),
-            button:first-child:nth-last-child(n+170) ~ button {
+            button:first-child:nth-last-child(n+197),
+            button:first-child:nth-last-child(n+197) ~ button {
                 width: 5.86vmin;
                 height: 5.86vmin;
                 margin: 0.4vmin;
@@ -598,6 +598,27 @@
                     if (!this._stopped) {
                         requestAnimationFrame(this.render.bind(this));
                     }
+                }
+            };
+
+            var Highscore = {
+                _time: undefined,
+                _size: undefined,
+
+                init: function (time, size) {
+                    this._time = time;
+                    this._size = size;
+
+                    Events.on('game.start', this.start.bind(this));
+                    Events.on('game.end', this.checkHighscore.bind(this));
+                },
+
+                start: function () {
+
+                },
+
+                checkHighscore: function () {
+
                 }
             };
 
