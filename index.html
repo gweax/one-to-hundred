@@ -601,24 +601,20 @@
                 }
             };
 
-            var Highscore = {
-                _time: undefined,
-                _size: undefined,
-
-                init: function (time, size) {
-                    this._time = time;
-                    this._size = size;
-
-                    Events.on('game.start', this.start.bind(this));
-                    Events.on('game.end', this.checkHighscore.bind(this));
+            var Feedback = {
+                init: function () {
+                    if (navigator.vibrate) {
+                        Events.on('step.ok', this.okFeedback);
+                        Events.on('step.error', this.errorFeedback);
+                    }
                 },
 
-                start: function () {
-
+                okFeedback: function () {
+                    navigator.vibrate(50);
                 },
 
-                checkHighscore: function () {
-
+                errorFeedback: function () {
+                    navigator.vibrate(300);
                 }
             };
 
@@ -627,6 +623,7 @@
             Countdown.init(document.querySelector('#countdown'), time);
             Area.init(document.querySelector('.area'), size);
             Game.init(document.querySelector('.start-button'));
+            Feedback.init();
 
         </script>
     </body>
