@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <title>1 to 100</title>
         <style>
             * {
@@ -437,7 +438,7 @@
                 },
 
                 render: function () {
-                    var timeLeftInSeconds = Math.max(0, Math.floor((this._duration - this._timePassed) / 1000)),
+                    var timeLeftInSeconds = Math.max(0, Math.ceil((this._duration - this._timePassed) / 1000)),
                         min, sec;
 
                     if (timeLeftInSeconds !== this._timeLeft) {
