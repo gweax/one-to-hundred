@@ -102,6 +102,10 @@
                 color: #ffffff;
             }
 
+            .area.is-paused > button:not([disabled]) {
+                color: transparent;
+            }
+
             /* button sizes */
 
             /* exactly 1 button */
@@ -286,7 +290,7 @@
 
                 <path id="area" stroke="none" fill="#ffcccc" />
                 <path id="line" stroke="#000000" stroke-linejoin="round" fill="none"/>
-                <line x1="0" y1="1000" x2="1000" y2="0" stroke="#888" stroke-dasharray="10 10"/>
+                <line x1="0" y1="1000" x2="1000" y2="0" stroke="#000" stroke-dasharray="10 10"/>
             </svg>
         </div>
 
@@ -343,27 +347,50 @@
 
             var Game = {
                 _element: null,
+                _state: 'stopped',
 
                 init: function (element) {
                     this._element = element;
                     this._element.disabled = false;
-                    this._element.addEventListener('click', this.start.bind(this), false);
+                    this._element.addEventListener('click', this.handleClick.bind(this), false);
 
                     Events.on('countdown.end', this.stop.bind(this));
                     Events.on('step.error', this.stop.bind(this));
                     Events.on('step.all', this.stop.bind(this));
                 },
 
-                start: function () {
-                    this._element.disabled = true;
+                handleClick: function () {
+                    if (this._state === 'stopped') {
+                        this.start();
+                    } else if (this._state === 'playing') {
+                        this.pause();
+                    } else if (this._state === 'paused') {
+                        this.resume();
+                    }
+                },
 
+                start: function () {
+                    this._element.innerHTML = 'Pause';
+                    this._state = 'playing';
                     Events.trigger('game.start');
                 },
 
                 stop: function () {
-                    this._element.disabled = false;
-
+                    this._element.innerHTML = 'Play';
+                    this._state = 'stopped';
                     Events.trigger('game.end');
+                },
+
+                pause: function () {
+                    this._element.innerHTML = 'Resume';
+                    this._state = 'paused';
+                    Events.trigger('game.pause');
+                },
+
+                resume: function () {
+                    this._element.innerHTML = 'Pause';
+                    this._state = 'playing';
+                    Events.trigger('game.resume');
                 }
             };
 
@@ -396,7 +423,7 @@
             var Countdown = {
                 _element: null,
                 _duration: 0,
-                _startTime: undefined,
+                _lastTime: undefined,
                 _timePassed: 0,
                 _timerId: null,
                 _timeLeft: undefined,
@@ -408,10 +435,13 @@
 
                     Events.on('game.start', this.start.bind(this));
                     Events.on('game.end', this.stop.bind(this));
+                    Events.on('game.pause', this.pause.bind(this));
+                    Events.on('game.resume', this.resume.bind(this));
                 },
 
                 start: function () {
-                    this._startTime = undefined;
+                    this._paused = false;
+                    this._lastTime = undefined;
                     this._timePassed = 0;
                     this._timeLeft = undefined;
                     this._timerId = requestAnimationFrame(this.step.bind(this));
@@ -421,17 +451,29 @@
                     cancelAnimationFrame(this._timerId);
                 },
 
+                pause: function () {
+                    this._paused = true;
+                },
+
+                resume: function () {
+                    this._paused = false;
+                    this._lastTime = undefined;
+                    this._timerId = requestAnimationFrame(this.step.bind(this));
+                },
+
                 step: function (timestamp) {
-                    if (typeof this._startTime === 'undefined') {
-                        this._startTime = timestamp;
+                    if (typeof this._lastTime !== 'undefined') {
+                        this._timePassed += timestamp - this._lastTime;
                     }
 
-                    this._timePassed = timestamp - this._startTime;
+                    this._lastTime = timestamp;
 
                     this.render();
 
                     if (this._timePassed <= this._duration) {
-                        this._timerId = requestAnimationFrame(this.step.bind(this));
+                        if (!this._paused) {
+                            this._timerId = requestAnimationFrame(this.step.bind(this));
+                        }
                     } else {
                         Events.trigger('countdown.end');
                     }
@@ -480,12 +522,20 @@
 
                     Events.on('game.start', this.start.bind(this));
                     Events.on('game.end', this.stop.bind(this));
+                    Events.on('game.pause', this.pause.bind(this));
+                    Events.on('game.resume', this.resume.bind(this));
                 },
 
                 start: function () {
                     this._last = 0;
                     this._stopped = false;
 
+                    // enable all buttons
+                    Array.apply(null, this._element.querySelectorAll('button')).forEach(function (el) {
+                        el.disabled = false;
+                    });
+
+                    // shuffle all enabled buttons
                     this.shuffle();
                 },
 
@@ -493,23 +543,35 @@
                     this._stopped = true;
                 },
 
+                pause: function () {
+                    this._element.classList.add('is-paused');
+                },
+
+                resume: function () {
+                    this._element.classList.remove('is-paused');
+
+                    // shuffle all enabled buttons
+                    this.shuffle();
+                },
+
                 shuffle: function () {
-                    var numbers = [], i, len, rnd, tmp;
+                    var buttons, numbers, i, len, rnd, tmp;
 
-                    for (i = 0, len = this._size; i < len; i++) {
-                        numbers[i] = i;
-                    }
+                    buttons = Array.apply(null, this._element.querySelectorAll('button:not([disabled]'));
 
-                    for (i = 0, len = this._size; i < len; i++) {
+                    numbers = buttons.map(function (el, i) {
+                        return el.style.order || i;
+                    });
+
+                    for (i = 0, len = numbers.length; i < len; i++) {
                         rnd = Math.floor(Math.random() * len);
                         tmp = numbers[i];
                         numbers[i] = rnd;
                         numbers[rnd] = tmp;
                     }
 
-                    Array.apply(null, this._element.querySelectorAll('button')).forEach(function (el, i) {
+                    buttons.forEach(function (el, i) {
                         el.style.order = numbers[i];
-                        el.disabled = false;
                     });
                 },
 
@@ -558,6 +620,8 @@
                     Events.on('game.start', this.start.bind(this));
                     Events.on('game.end', this.stop.bind(this));
                     Events.on('step.ok', this.step.bind(this));
+                    Events.on('game.pause', this.pause.bind(this));
+                    Events.on('game.resume', this.resume.bind(this));
                 },
 
                 start: function () {
@@ -571,6 +635,15 @@
 
                 stop: function () {
                     this._stopped = true;
+                },
+
+                pause: function () {
+                    this._stopped = true;
+                },
+
+                resume: function () {
+                    this._stopped = false;
+                    requestAnimationFrame(this.render.bind(this));
                 },
 
                 step: function () {
