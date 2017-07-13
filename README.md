@@ -4,17 +4,17 @@ A game: Can you pick the numbers from 1 to 100 in just four minutes?
 
 ## Play
 
-Play at http://gweax.github.io/one-to-hundred/
+Play at https://gweax.github.io/one-to-hundred/
 
 ## Too difficult? Too easy?
 
-Configure the size e.g. http://gweax.github.io/one-to-hundred/?size=64
+Configure the size e.g. https://gweax.github.io/one-to-hundred/?size=64
 
 ## Too little time? Too much?
 
-Configure the time e.g. http://gweax.github.io/one-to-hundred/?time=200
+Configure the time e.g. https://gweax.github.io/one-to-hundred/?time=200
 
-Combine both settings: http://gweax.github.io/one-to-hundred/?size=49&time=120
+Combine both settings: https://gweax.github.io/one-to-hundred/?size=49&time=120
 
 ## License
 
