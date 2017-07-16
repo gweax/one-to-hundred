@@ -1,0 +1,266 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  font-family: sans-serif;
+}
+
+.area {
+  width: 100vmin;
+  height: 100vmin;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+  -webkit-align-content: flex-start;
+  -ms-flex-line-pack: start;
+  align-content: flex-start;
+}
+
+.stats {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.controls {
+  font-size: 6vmin;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-justify-content: space-around;
+  -ms-flex-pack: distribute;
+  justify-content: space-around;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.graph {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.start-button {
+  font-size: inherit;
+  width: 90%;
+  height: 1.5em;
+  margin: 0;
+  background: linear-gradient(145deg, #ffffff, #d50154 30%);
+  color: #ffffff;
+  border-radius: 8px;
+  border: none;
+}
+
+.start-button[disabled] {
+  visibility: hidden;
+}
+
+button {
+  border: 1px solid #efefef;
+  border-radius: 3px;
+  background: linear-gradient(145deg, #ffffff, #efefef);
+}
+
+button[disabled] {
+  background: linear-gradient(145deg, #ffffff, #9ebd4f);
+  color: #ffffff;
+}
+
+.area.is-paused > button:not([disabled]) {
+  color: transparent;
+}
+
+/* button sizes */
+
+/* exactly 1 button */
+button:first-child:last-child {
+  width: 98vmin;
+  height: 98vmin;
+  margin: 1vmin;
+  font-size: 15vmin;
+}
+
+/* min 2 buttons (max 4) */
+button:first-child:nth-last-child(n + 2),
+button:first-child:nth-last-child(n + 2) ~ button {
+  width: 49vmin;
+  height: 49vmin;
+  margin: 0.5vmin;
+  font-size: 15vmin;
+}
+
+/* min 5 buttons (max 9) */
+button:first-child:nth-last-child(n + 5),
+button:first-child:nth-last-child(n + 5) ~ button {
+  width: 32.33vmin;
+  height: 32.33vmin;
+  margin: 0.5vmin;
+  font-size: 10vmin;
+}
+
+/* min 10 buttons (max 16) */
+button:first-child:nth-last-child(n + 10),
+button:first-child:nth-last-child(n + 10) ~ button {
+  width: 24vmin;
+  height: 24vmin;
+  margin: 0.5vmin;
+  font-size: 8vmin;
+}
+
+/* min 17 buttons (max 25) */
+button:first-child:nth-last-child(n + 17),
+button:first-child:nth-last-child(n + 17) ~ button {
+  width: 19vmin;
+  height: 19vmin;
+  margin: 0.5vmin;
+  font-size: 6vmin;
+}
+
+/* min 26 buttons (max 36) */
+button:first-child:nth-last-child(n + 26),
+button:first-child:nth-last-child(n + 26) ~ button {
+  width: 15.66vmin;
+  height: 15.66vmin;
+  margin: 0.5vmin;
+  font-size: 5vmin;
+}
+
+/* min 37 buttons (max 49) */
+button:first-child:nth-last-child(n + 37),
+button:first-child:nth-last-child(n + 37) ~ button {
+  width: 13.28vmin;
+  height: 13.28vmin;
+  margin: 0.5vmin;
+  font-size: 4.3vmin;
+}
+
+/* min 50 buttons (max 64) */
+button:first-child:nth-last-child(n + 50),
+button:first-child:nth-last-child(n + 50) ~ button {
+  width: 11.5vmin;
+  height: 11.5vmin;
+  margin: 0.5vmin;
+  font-size: 3.6vmin;
+}
+
+/* min 65 buttons (max 81) */
+button:first-child:nth-last-child(n + 65),
+button:first-child:nth-last-child(n + 65) ~ button {
+  width: 10.11vmin;
+  height: 10.11vmin;
+  margin: 0.5vmin;
+  font-size: 3.3vmin;
+}
+
+/* min 82 buttons (max 100) */
+button:first-child:nth-last-child(n + 82),
+button:first-child:nth-last-child(n + 82) ~ button {
+  width: 9vmin;
+  height: 9vmin;
+  margin: 0.5vmin;
+  font-size: 3vmin;
+}
+
+/* min 101 buttons (max 121) */
+button:first-child:nth-last-child(n + 101),
+button:first-child:nth-last-child(n + 101) ~ button {
+  width: 8.09vmin;
+  height: 8.09vmin;
+  margin: 0.5vmin;
+  font-size: 2.7vmin;
+}
+
+/* min 122 buttons (max 144) */
+button:first-child:nth-last-child(n + 122),
+button:first-child:nth-last-child(n + 122) ~ button {
+  width: 7.25vmin;
+  height: 7.25vmin;
+  margin: 0.5vmin;
+  font-size: 2.4vmin;
+}
+
+/* min 145 buttons (max 169) */
+button:first-child:nth-last-child(n + 145),
+button:first-child:nth-last-child(n + 145) ~ button {
+  width: 6.79vmin;
+  height: 6.79vmin;
+  margin: 0.4vmin;
+  font-size: 2.2vmin;
+}
+
+/* min 170 buttons (max 196) */
+button:first-child:nth-last-child(n + 170),
+button:first-child:nth-last-child(n + 170) ~ button {
+  width: 6.34vmin;
+  height: 6.34vmin;
+  margin: 0.4vmin;
+  font-size: 2vmin;
+}
+
+/* min 197 buttons (max 225) */
+button:first-child:nth-last-child(n + 197),
+button:first-child:nth-last-child(n + 197) ~ button {
+  width: 5.86vmin;
+  height: 5.86vmin;
+  margin: 0.4vmin;
+  font-size: 1.9vmin;
+}
+
+@media (orientation: landscape) {
+  body {
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+
+  .stats {
+    -webkit-order: 1;
+    -ms-flex-order: 1;
+    order: 1;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    text-align: center;
+    -webkit-flex: 1 0 auto;
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto;
+    max-width: 60vmin;
+  }
+
+  .start-button {
+    width: 90%;
+  }
+}
