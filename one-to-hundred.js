@@ -269,11 +269,11 @@ var Area = {
 
     buttons = Array.apply(
       null,
-      this._element.querySelectorAll("button:not([disabled]")
+      this._element.querySelectorAll("button:not([disabled])")
     );
 
     numbers = buttons.map(function(el, i) {
-      return el.style.order || i;
+      return el.style.order || el.style.webkitOrder || i;
     });
 
     for (i = 0, len = numbers.length; i < len; i++) {
@@ -285,6 +285,7 @@ var Area = {
 
     buttons.forEach(function(el, i) {
       el.style.order = numbers[i];
+      el.style.webkitOrder = numbers[i];
     });
   },
 
