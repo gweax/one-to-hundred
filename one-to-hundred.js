@@ -1,28 +1,46 @@
-var size = (function() {
-  var match = location.search.match(/size=(\d+)/);
-  return Math.min(225, (match && Number(match[1])) || 100);
-})();
+var Utils = {
+  formatTime: function(timeInSeconds) {
+    var min = Math.floor(timeInSeconds / 60);
+    var sec = Math.floor(timeInSeconds % 60);
 
-document.title = "1 to " + size;
-
-function getDefaultTime(size) {
-  var sqrt = Math.sqrt(size);
-
-  if (sqrt >= 7) {
-    return Math.floor(10 * (Math.pow(sqrt - 6, 2) + 8));
+    return min + ":" + (sec < 10 ? "0" : "") + sec;
   }
+};
 
-  if (sqrt >= 4) {
-    return Math.floor(30 + 20 * (sqrt - 4));
+var Config = {
+  size: 100,
+
+  init: function () {
+    this.size = this._getSize();
+    this.time = this._getTime() || this._getDefaultTime(this.size);
+
+    document.title = `1 to ${this.size}`;
+  },
+
+  _getSize: function() {
+    var match = location.search.match(/size=(\d+)/);
+    return Math.min(225, (match && Number(match[1])) || 100);
+  },
+
+  _getTime: function() {
+    var match = location.search.match(/time=(\d+)/);
+    return (match && Number(match[1]));
+  },
+
+  _getDefaultTime: function(size) {
+    var sqrt = Math.sqrt(size);
+
+    if (sqrt >= 7) {
+      return Math.floor(10 * (Math.pow(sqrt - 6, 2) + 8));
+    }
+  
+    if (sqrt >= 4) {
+      return Math.floor(30 + 20 * (sqrt - 4));
+    }
+  
+    return Math.floor(7.5 * sqrt);
   }
-
-  return Math.floor(7.5 * sqrt);
-}
-
-var time = (function() {
-  var match = location.search.match(/time=(\d+)/);
-  return (match && Number(match[1])) || getDefaultTime(size);
-})();
+};
 
 var Events = {
   _handlers: {},
@@ -99,7 +117,7 @@ var Game = {
 
 var Counter = {
   _element: null,
-  _value: 0,
+  value: 0,
 
   init: function(element) {
     this._element = element;
@@ -109,17 +127,17 @@ var Counter = {
   },
 
   start: function() {
-    this._value = 0;
+    this.value = 0;
     this.render();
   },
 
   handleStep: function(value) {
-    this._value = value;
+    this.value = value;
     this.render();
   },
 
   render: function() {
-    this._element.innerHTML = this._value;
+    this._element.innerHTML = this.value;
   }
 };
 
@@ -127,7 +145,7 @@ var Countdown = {
   _element: null,
   _duration: 0,
   _lastTime: undefined,
-  _timePassed: 0,
+  timePassed: 0,
   _timerId: null,
   _timeLeft: undefined,
 
@@ -145,7 +163,7 @@ var Countdown = {
   start: function() {
     this._paused = false;
     this._lastTime = undefined;
-    this._timePassed = 0;
+    this.timePassed = 0;
     this._timeLeft = undefined;
     this._timerId = requestAnimationFrame(this.step.bind(this));
   },
@@ -166,14 +184,14 @@ var Countdown = {
 
   step: function(timestamp) {
     if (typeof this._lastTime !== "undefined") {
-      this._timePassed += timestamp - this._lastTime;
+      this.timePassed += timestamp - this._lastTime;
     }
 
     this._lastTime = timestamp;
 
     this.render();
 
-    if (this._timePassed <= this._duration) {
+    if (this.timePassed <= this._duration) {
       if (!this._paused) {
         this._timerId = requestAnimationFrame(this.step.bind(this));
       }
@@ -185,22 +203,17 @@ var Countdown = {
   render: function() {
     var timeLeftInSeconds = Math.max(
         0,
-        Math.ceil((this._duration - this._timePassed) / 1000)
-      ),
-      min,
-      sec;
+        Math.ceil((this._duration - this.timePassed) / 1000)
+      );
 
     if (timeLeftInSeconds !== this._timeLeft) {
-      min = Math.floor(timeLeftInSeconds / 60);
-      sec = timeLeftInSeconds % 60;
-
-      this._element.innerHTML = min + ":" + (sec < 10 ? "0" : "") + sec;
+      this._element.innerHTML = Utils.formatTime(timeLeftInSeconds);
       this._timeLeft = timeLeftInSeconds;
     }
   },
 
   getProgress: function() {
-    return this._timePassed / this._duration;
+    return this.timePassed / this._duration;
   }
 };
 
@@ -445,9 +458,68 @@ var Feedback = {
   }
 };
 
+var Highscore = {
+  _scores: {},
+
+  init: function() {
+    var scores = localStorage.getItem("scores");
+
+    if (scores) {
+      try {
+        this._scores = JSON.parse(scores);
+      } catch (e) {}
+    }
+
+    Events.on("game.end", this.showHighscore.bind(this));
+  },
+
+  showHighscore: function () {
+    var value, time, score, finishedBefore, succeeded, message;
+
+    value = Counter.value;
+    time = Countdown.timePassed;
+    score = this._scores[`${Config.size}`] || {};
+    finishedBefore = typeof score.time === "number";
+    succeeded = value === Config.size;
+
+    if (succeeded) {
+      if (!score.time || time < score.time) {
+        message = finishedBefore
+          ? `New highscore! ${Utils.formatTime(time / 1000)}s, before ${Utils.formatTime(score.time / 1000)}s`
+          : `Congrats! You succeeded for the first time`;
+
+        alert(message);
+        this.setHighscore(value, time);
+      }
+    } else {
+      if (!score.value || value > score.value) {
+        message = score.value
+          ? `New highscore! ${value}, before ${score.value}`
+          : Countdown.getProgress() > 0.75
+            ? `Well done!`
+            : `Nice first try!`;
+
+        alert(message);
+        this.setHighscore(value);
+      }
+    }
+  },
+
+  setHighscore: function (value, time) {
+    this._scores[Config.size] = {
+      value: value,
+      time: time ? Math.floor(time) : undefined
+    };
+
+    localStorage.setItem("scores", JSON.stringify(this._scores));
+  }
+};
+
+Config.init();
 Stats.init(document.querySelector(".graph"));
 Counter.init(document.querySelector("#counter"));
-Countdown.init(document.querySelector("#countdown"), time);
-Area.init(document.querySelector(".area"), size);
+Countdown.init(document.querySelector("#countdown"), Config.time);
+Area.init(document.querySelector(".area"), Config.size);
 Game.init(document.querySelector(".start-button"));
 Feedback.init();
+Highscore.init();
