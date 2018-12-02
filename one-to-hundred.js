@@ -14,7 +14,7 @@ var Config = {
     this.size = this._getSize();
     this.time = this._getTime() || this._getDefaultTime(this.size);
 
-    document.title = `1 to ${this.size}`;
+    document.title = "1 to " + this.size;
   },
 
   _getSize: function() {
@@ -407,8 +407,8 @@ var Stats = {
     function coordsToLines(coords, i, arr) {
       var prevY = i > 0 ? arr[i - 1].y : origin.y;
 
-      var horizontal = ` L ${coords.x},${prevY}`,
-        vertical = ` L ${coords.x},${coords.y}`;
+      var horizontal = " L " + coords.x + "," + prevY,
+        vertical = " L " + coords.x + "," + coords.y;
 
       return horizontal + vertical;
     }
@@ -478,15 +478,15 @@ var Highscore = {
 
     value = Counter.value;
     time = Countdown.timePassed;
-    score = this._scores[`${Config.size}`] || {};
+    score = this._scores[Config.size] || {};
     finishedBefore = typeof score.time === "number";
     succeeded = value === Config.size;
 
     if (succeeded) {
       if (!score.time || time < score.time) {
         message = finishedBefore
-          ? `New highscore! ${Utils.formatTime(time / 1000)}s, before ${Utils.formatTime(score.time / 1000)}s`
-          : `Congrats! You succeeded for the first time`;
+          ? "New highscore! " + Utils.formatTime(time / 1000) + "s, before " + Utils.formatTime(score.time / 1000) + "s"
+          : "Congrats! You succeeded for the first time";
 
         alert(message);
         this.setHighscore(value, time);
@@ -494,10 +494,10 @@ var Highscore = {
     } else {
       if (!score.value || value > score.value) {
         message = score.value
-          ? `New highscore! ${value}, before ${score.value}`
+          ? "New highscore! " + value + ", before " + score.value
           : Countdown.getProgress() > 0.75
-            ? `Well done!`
-            : `Nice first try!`;
+            ? "Well done!"
+            : "Nice first try!";
 
         alert(message);
         this.setHighscore(value);
